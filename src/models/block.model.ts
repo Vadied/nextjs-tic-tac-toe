@@ -1,3 +1,3 @@
 export interface IBlock {
-  value: "X" | "O" | "";
+  value: "X" | "O" | "-";
 }

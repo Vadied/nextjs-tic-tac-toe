@@ -2,20 +2,20 @@ import { IBlock } from "@/models/block.model";
 import { IUser } from "@/models/user.model";
 
 export const blocksDefault: IBlock[] = [
-  { value: "" },
-  { value: "" },
-  { value: "" },
-  { value: "" },
-  { value: "" },
-  { value: "" },
-  { value: "" },
-  { value: "" },
-  { value: "" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
+  { value: "-" },
 ];
 
 export const usersDefault: IUser[] = [
-  { name: "First", surname: "User", sign: "X", isCurrent: false },
-  { name: "Second", surname: "User", sign: "O", isCurrent: false },
+  { name: "First", surname: "User", sign: "X" },
+  { name: "Second", surname: "User", sign: "O" },
 ];
 
 const winningCombinations = [

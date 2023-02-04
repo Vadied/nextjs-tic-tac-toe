@@ -9,7 +9,7 @@ const Content = () => {
   const { t } = useTranslation();
   const { content } = useContext(PopupContext);
 
-  return <div className="content">{t(content)}</div>;
+  return <div className="h-min-32 flex-grow text-sm text-gray-600 mt-2">{t(content)}</div>;
 };
 
 export default Content;

@@ -1,50 +1,48 @@
-import { createContext, useCallback, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 
 import { IUser } from "@/models/user.model";
 
 import { usersDefault } from "@/assets/constants/init";
 
 interface context extends IUser {
+  users: IUser[];
+  getWinner(s: string): IUser;
   changeUser(): void;
   setFirstPlayer(): void;
 }
 
 export const UserContext = createContext({} as context);
 
+// SocketIO
+// in this context we can use a socketIo instance to manage
+// a multiplayer version
+
 type Props = {
   children: JSX.Element;
 };
 const UserProvider = ({ children }: Props) => {
-  const [users, setUsers] = useState(usersDefault);
+  const [users] = useState(usersDefault);
+  const [current, setCurrent] = useState(0);
 
-  const changeUser = useCallback(
-    () =>
-      setUsers(() =>
-        (users as IUser[]).map((u) => ({
-          ...u,
-          isCurrent: !u.isCurrent,
-        }))
-      ),
-    [setUsers]
-  );
+  const changeUser = () => {
+    setCurrent((current) => (current === 0 ? 1 : 0));
+  };
 
   const setFirstPlayer = () => {
     const index = Math.random() < 0.5 ? 0 : 1;
-    setUsers((users) =>
-      users.map((u, i) => (i !== index ? u : { ...u, isCurrent: true }))
-    );
+    setCurrent(index);
   };
+
+  const getWinner = (winnerSign: string) => users.find((u) => u.sign === winnerSign) as IUser;
 
   useEffect(() => {
     setFirstPlayer();
   }, []);
 
-  const currentUser =
-    (users as IUser[]).find((u) => u.isCurrent) || ({} as IUser);
-
-  console.log("currentUser ---->", currentUser);
   const context = {
-    ...currentUser,
+    ...users[current],
+    users,
+    getWinner,
     changeUser,
     setFirstPlayer,
   };

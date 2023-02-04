@@ -7,9 +7,9 @@ import {
 } from "react";
 
 import { IBlock } from "@/models/block.model";
-import { IUser } from "@/models/user.model";
 
 import { UserContext } from "./users";
+import { PopupContext } from "./popup";
 
 import { blocksDefault } from "@/assets/constants/init";
 
@@ -25,50 +25,63 @@ type Props = {
   children: JSX.Element;
 };
 const GameProvider = ({ children }: Props) => {
-  const { sign, changeUser, setFirstPlayer } = useContext(UserContext);
+  const { sign, getWinner, changeUser, setFirstPlayer } =
+    useContext(UserContext);
+  const { openPopup } = useContext(PopupContext);
 
   const [blocks, setBlocks] = useState(blocksDefault);
-  const [winner, setWinner] = useState<IUser | null>(null);
+  const [isEnabled, setIsEnabled] = useState(true);
 
-  const checkWinner = async (blocks: IBlock[]): Promise<IUser | null> => {
+  const checkWinner = async (blocks: IBlock[]) => {
+    const values = blocks.map((b) => b.value).join("");
     try {
       const response = await fetch("/api/get-winner", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ blocks }),
+        body: JSON.stringify({ values }),
       });
 
       return response.json();
-    } catch (err) {
-      return null;
+    } catch (error) {
+      return { error };
     }
   };
 
-  const checkMoves = (blocks: IBlock[]) => {
-    console.log(blocks)
-    return blocks.some((b) => !b.value);
-  }
+  const hasMoves = (blocks: IBlock[]) => blocks.some((b) => b.value === "-");
+
+  const endGame = (winnerSign: string) => {
+    setIsEnabled(false);
+
+    if (!winnerSign)
+      return openPopup({
+        title: "Draw",
+        content: ``,
+      });
+
+    const winner = getWinner(winnerSign);
+    openPopup({
+      title: "Winner",
+      content: `${winner.name} ${winner.surname}`,
+    });
+  };
 
   const handleChange = useCallback(async (blocks: IBlock[]) => {
     // fetch api to check if there is a winner
-    const winner = await checkWinner(blocks);
-    // console.log("winner ---->", winner)
-    // if (!!winner) {
-    //   return setWinner(winner as IUser);
-    // }
+    const result = await checkWinner(blocks);
+    if (!result.error) return endGame(result.winner);
 
     // if winner open modal to show who is the winner
-    if (!checkMoves(blocks)) {
-      return setWinner(null);
-    }
+    if (!hasMoves(blocks)) return endGame("");
 
     // if no winner but moves available keep going
     changeUser();
   }, []);
 
   const clickBlock = (index: number) => {
+    if (!isEnabled) return;
+
     const newBlocks = blocks.map((b, i) =>
       i !== index ? b : { ...b, value: sign }
     ) as IBlock[];
@@ -79,9 +92,9 @@ const GameProvider = ({ children }: Props) => {
 
   const resetGame = () => {
     setFirstPlayer();
-    setBlocks(blocksDefault)
-    setWinner(null)
-  }
+    setBlocks(blocksDefault);
+    setIsEnabled(true);
+  };
 
   const context = {
     blocks,

@@ -18,6 +18,7 @@ const PopupProvider = ({ children }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const openPopup = (popup: IPopup) => {
+    console.log("test")
     setPopup(popup);
     setIsOpen(true);
   };

@@ -7,9 +7,9 @@ type Props = {
 };
 const Context = ({ children }: Props) => (
   <UserProvider>
-    <GameProvider>
-      <PopupProvider>{children}</PopupProvider>
-    </GameProvider>
+    <PopupProvider>
+      <GameProvider>{children}</GameProvider>
+    </PopupProvider>
   </UserProvider>
 );
 export default Context;
