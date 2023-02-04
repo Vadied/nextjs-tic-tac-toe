@@ -1,0 +1,11 @@
+{
+  "button": {
+    "close": {
+      "label": "Close"
+    }
+  },
+  "header": {
+    "player": "Current player",
+    "btn": { "reset": "Reset" }
+  }
+}
